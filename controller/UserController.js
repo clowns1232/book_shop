@@ -79,21 +79,21 @@ const requsetPasswordReset = (req, res) => {
 const passwordReset = (req, res) => {
   const { email, password } = req.body;
 
-  const sql = `UPDATE users SET password=? salt=? WHERE email=?`;
+  const sql = `UPDATE users SET password=?, salt=? WHERE email=?`;
   const salt = crypto.randomBytes(64).toString("base64");
 
   const hashPasswrd = crypto
-    .pbkdf2Sync(password, salt, 10000, 64, "sha512")
+    .pbkdf2Sync(password, salt, 10000, 10, "sha512")
     .toString("base64");
   const values = [hashPasswrd, salt, email];
 
-  conn.query(sql, values, (err, values) => {
+  conn.query(sql, values, (err, results) => {
     if (err) {
       console.log(err);
       return res.status(StatusCodes.BAD_REQUEST).end();
     }
 
-    if (results.affectedRows === 0) {
+    if (results.affectedRows == 0) {
       return res.status(StatusCodes.BAD_REQUEST).end();
     } else {
       return res.status(StatusCodes.OK).json(results);
