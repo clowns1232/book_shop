@@ -3,7 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 
 const allBooks = (req, res) => {
   let { category_id, isNew, currentPage, limit } = req.query;
-  if (currentPage && limit) {
+  if (!(currentPage && limit)) {
     return res.status(StatusCodes.BAD_REQUEST).end();
   }
 
@@ -12,22 +12,23 @@ const allBooks = (req, res) => {
 
   const offset = (currentPage - 1) * limit;
 
-  let sql = "SELECT * FROM books LIMIT ? OFFSET ?";
-  const values = [limit, offset];
+  let sql = "SELECT * FROM books";
+  const values = [];
 
   if (category_id && isNew) {
     sql +=
       " WHERE category_id=? AND pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()";
-    values.push(category_id, isNew);
+    values.push(category_id);
   } else if (category_id) {
     sql += " WHERE category_id=?";
     values.push(category_id);
   } else if (isNew) {
     sql +=
       " WHERE pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()";
-    values.push(isNew);
   }
 
+  sql += " LIMIT ? OFFSET ?";
+  values.push(limit, offset);
   console.log(sql, values);
 
   conn.query(sql, values, (err, results) => {
