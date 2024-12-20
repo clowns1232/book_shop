@@ -1,6 +1,6 @@
-const mariadb = require("mysql2");
+const mariadb = require("mysql2/promise");
 
-const conn = mariadb.createConnection({
+const connection = mariadb.createPool({
   host: "localhost",
   user: "root",
   password: process.env.PASSWORD,
@@ -9,4 +9,4 @@ const conn = mariadb.createConnection({
   port: "3306",
 });
 
-module.exports = conn;
+module.exports = connection;
